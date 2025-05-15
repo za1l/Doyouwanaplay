@@ -111,10 +111,6 @@ const Game = ({ onGameComplete }) => {
 
   return (
     <div className="game-container">
-      <h1>¡Atrapa el punto rojo Rebo!</h1>
-      <div className="score">
-        Nivel: <span>{level}</span> | Puntos: <span>{score}</span>
-      </div>
       <div
         className="game-area"
         onMouseMove={handleInteraction}
@@ -126,6 +122,10 @@ const Game = ({ onGameComplete }) => {
           style={{ width: `${targetSize}px`, height: `${targetSize}px` }}
           onMouseOver={handleTargetHover}
         />
+      </div>
+      <h1>¡Atrapa el punto rojo Rebo!</h1>
+      <div className="score">
+        Nivel: <span>{level}</span> | Puntos: <span>{score}</span>
       </div>
     </div>
   );
