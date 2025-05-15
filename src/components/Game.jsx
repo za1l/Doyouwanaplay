@@ -1,10 +1,28 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import "../styles/Game.css";
 
 const Game = ({ onGameComplete }) => {
   const [score, setScore] = useState(0);
   const [gameActive, setGameActive] = useState(false);
   const [targetSize, setTargetSize] = useState(30);
+  const [level, setLevel] = useState(1);
+  const [speed, setSpeed] = useState(1);
+  const audioRef = useRef(null);
+  const popSound = useRef(null);
+  const levelUpSound = useRef(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio("/game-music.mp3");
+    popSound.current = new Audio("/pop.mp3");
+    levelUpSound.current = new Audio("/level-up.mp3");
+    audioRef.current.loop = true;
+    return () => {
+      audioRef.current.pause();
+      audioRef.current = null;
+      popSound.current = null;
+      levelUpSound.current = null;
+    };
+  }, []);
 
   const moveTarget = useCallback(
     (target) => {
@@ -14,26 +32,42 @@ const Game = ({ onGameComplete }) => {
       const maxX = gameArea.clientWidth - target.clientWidth;
       const maxY = gameArea.clientHeight - target.clientHeight;
 
-      target.style.left = `${Math.random() * maxX}px`;
-      target.style.top = `${Math.random() * maxY}px`;
+      const newX = Math.random() * maxX;
+      const newY = Math.random() * maxY;
+
+      target.style.left = `${newX}px`;
+      target.style.top = `${newY}px`;
+
+      if (speed > 1) {
+        setTimeout(() => moveTarget(target), 2000 / speed);
+      }
     },
-    [gameActive]
+    [gameActive, speed]
   );
 
   const handleTargetHover = (e) => {
     if (!gameActive) return;
 
+    popSound.current.currentTime = 0;
+    popSound.current.play();
+
     setScore((prevScore) => {
       const newScore = prevScore + 1;
 
-      if (newScore >= 5) {
+      if (newScore >= 15) {
+        audioRef.current.pause();
         setGameActive(false);
         onGameComplete();
         return newScore;
       }
-      if (newScore > 3) {
-        setTargetSize(20);
+
+      if (newScore % 5 === 0) {
+        levelUpSound.current.play();
+        setLevel((prevLevel) => prevLevel + 1);
+        setSpeed((prevSpeed) => prevSpeed + 0.5);
+        setTargetSize((prevSize) => Math.max(prevSize - 5, 10));
       }
+
       return newScore;
     });
 
@@ -63,18 +97,26 @@ const Game = ({ onGameComplete }) => {
     setGameActive(true);
     setScore(0);
     setTargetSize(30);
+    setLevel(1);
+    setSpeed(1);
+    audioRef.current.currentTime = 0;
+    audioRef.current.play();
     const target = document.getElementById("target");
     moveTarget(target);
   };
 
+  useEffect(() => {
+    startGame();
+  }, []);
+
   return (
     <div className="game-container">
-      <h1>¡Atrapa el punto rojo!</h1>
+      <h1>¡Atrapa el punto rojo Rebo!</h1>
       <div className="score">
-        Puntos: <span>{score}</span>
+        Nivel: <span>{level}</span> | Puntos: <span>{score}</span>
       </div>
-      <div 
-        className="game-area" 
+      <div
+        className="game-area"
         onMouseMove={handleInteraction}
         onTouchMove={handleInteraction}
       >
@@ -85,9 +127,6 @@ const Game = ({ onGameComplete }) => {
           onMouseOver={handleTargetHover}
         />
       </div>
-      <button className="button" onClick={startGame}>
-        Empezar Juego
-      </button>
     </div>
   );
 };

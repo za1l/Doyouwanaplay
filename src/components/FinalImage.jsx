@@ -27,7 +27,7 @@ const FinalImage = ({ onRestart }) => {
       />
       {showRestartButton && (
         <button className="restart-button" onClick={onRestart}>
-          Volver a Empezar
+          Empieza de nuevo Ale
         </button>
       )}
     </div>
