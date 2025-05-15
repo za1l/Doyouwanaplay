@@ -54,7 +54,7 @@ const Game = ({ onGameComplete }) => {
     setScore((prevScore) => {
       const newScore = prevScore + 1;
 
-      if (newScore >= 8) {
+      if (newScore >= 4) {
         audioRef.current.pause();
         setGameActive(false);
         onGameComplete();
