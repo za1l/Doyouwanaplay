@@ -54,14 +54,14 @@ const Game = ({ onGameComplete }) => {
     setScore((prevScore) => {
       const newScore = prevScore + 1;
 
-      if (newScore >= 15) {
+      if (newScore >= 8) {
         audioRef.current.pause();
         setGameActive(false);
         onGameComplete();
         return newScore;
       }
 
-      if (newScore % 5 === 0) {
+      if (newScore % 3 === 0) {
         levelUpSound.current.play();
         setLevel((prevLevel) => prevLevel + 1);
         setSpeed((prevSpeed) => prevSpeed + 0.5);
